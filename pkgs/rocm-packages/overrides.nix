@@ -96,6 +96,14 @@ applyOverrides {
         zlib
         zstd
       ];
+
+      installPhase =
+        (prevAttrs.installPhase or "")
+        + ''
+          # Dead symlink(s).
+          chmod -R +w $out/lib
+          rm -f $out/lib/llvm/bin/flang
+        '';
     };
 
   rocminfo =
