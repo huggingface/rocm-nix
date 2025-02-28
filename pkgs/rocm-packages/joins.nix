@@ -24,6 +24,7 @@ final: prev: {
       version = final.hipcc.version;
 
       nativeBuildInputs = [
+        final.markForRocmRootHook
         makeWrapper
         rsync
       ];
@@ -33,6 +34,7 @@ final: prev: {
         rocm-device-libs
         hsa-rocr
         rocminfo
+        setupRocmHook
       ];
 
       dontUnpack = true;
@@ -43,7 +45,7 @@ final: prev: {
         mkdir -p $out
 
         for path in ${hipcc} ${hip-dev} ${hip-runtime-amd} ${rocm-opencl}; do
-          rsync -a $path/ $out/
+          rsync -a --exclude=nix-support $path/ $out/
         done
 
         chmod -R u+w $out
@@ -86,6 +88,7 @@ final: prev: {
     version = final.hipcc.version;
 
     nativeBuildInputs = [
+      final.markForRocmRootHook
       makeWrapper
       rsync
     ];
@@ -98,7 +101,7 @@ final: prev: {
       mkdir -p $out
 
       for path in ${openmp-extras-dev} ${openmp-extras-runtime}; do
-        rsync -a $path/lib/llvm/ $out/
+        rsync --exclude=nix-support -a $path/lib/llvm/ $out/
       done
 
       runHook postInstall
