@@ -39,6 +39,7 @@ stdenv.mkDerivation rec {
 
   nativeBuildInputs = [
     autoPatchelfHook
+    rocmPackages.markForRocmRootHook
     rsync
   ];
 
@@ -48,10 +49,12 @@ stdenv.mkDerivation rec {
   ] ++ (map (dep: rocmPackages.${dep}) filteredDeps);
 
   installPhase = ''
+    runHook preInstall
     mkdir $out
     for bundleSrc in ${lib.concatStringsSep " " components}; do
       rsync -a ${src}/component-rocm/$bundleSrc/content/opt/rocm-${version}/* $out/
     done
+    runHook postInstall
   '';
 
   autoPatchelfIgnoreMissingDeps = [

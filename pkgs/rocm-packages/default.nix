@@ -8,6 +8,8 @@ let
   runfileMetadata = builtins.fromJSON (builtins.readFile ./runfile-metadata.json);
   fixedPoint = final: { inherit callPackage lib runfileMetadata; };
   composed = lib.composeManyExtensions [
+    # Hooks
+    (import ./hooks.nix)
     # Base package set.
     (import ./components.nix)
     # Overrides (adding dependencies, etc.)
