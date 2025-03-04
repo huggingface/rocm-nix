@@ -3,6 +3,7 @@
   wrapCCWith,
   bintools,
   glibc,
+  hip-dev,
   llvm,
   rocm-device-libs,
   rsync,
@@ -13,7 +14,7 @@ wrapCCWith rec {
 
   cc = stdenv.mkDerivation {
     inherit (llvm) version;
-    pname = "romc-llvm-clang";
+    pname = "rocm-llvm-clang";
 
     nativeBuildInputs = [ rsync ];
 
@@ -35,6 +36,12 @@ wrapCCWith rec {
 
       substituteInPlace $out/bin/rocm.cfg \
         --replace-fail "<CFGDIR>/../../.." "<CFGDIR>/.."
+
+      # We need to set the version to signal to clang that we want to
+      # include HIP/CUDA compatibility headers.
+      chmod -R +w $out/share
+      mkdir -p $out/share/hip
+      cp ${hip-dev}/share/hip/version $out/share/hip
 
       runHook postInstall
     '';
