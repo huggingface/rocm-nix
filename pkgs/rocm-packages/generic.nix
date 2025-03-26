@@ -57,7 +57,7 @@ stdenv.mkDerivation rec {
   installPhase = ''
     runHook preInstall
     mkdir $out
-    cp -a opt/rocm-*/* $out
+    cp -rT opt/rocm-* $out
     runHook postInstall
   '';
 
