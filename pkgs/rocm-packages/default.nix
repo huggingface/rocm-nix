@@ -5,8 +5,8 @@
 }:
 
 let
-  runfileMetadata = builtins.fromJSON (builtins.readFile ./runfile-metadata.json);
-  fixedPoint = final: { inherit callPackage lib runfileMetadata; };
+  packageMetadata = builtins.fromJSON (builtins.readFile ./rocm-6.3.4-metadata.json);
+  fixedPoint = final: { inherit callPackage lib packageMetadata; };
   composed = lib.composeManyExtensions [
     # Hooks
     (import ./hooks.nix)
