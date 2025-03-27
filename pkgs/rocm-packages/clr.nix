@@ -10,6 +10,7 @@
   hip-dev,
   hip-runtime-amd,
   hsa-rocr,
+  perl,
   rocm-device-libs,
   rocm-opencl,
   rocminfo,
@@ -42,6 +43,7 @@ stdenv.mkDerivation {
     comgr
     rocm-device-libs
     hsa-rocr
+    perl
     rocminfo
     setupRocmHook
   ];

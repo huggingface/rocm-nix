@@ -2,16 +2,19 @@
   lib,
   autoPatchelfHook,
   callPackage,
+  fetchurl,
   stdenv,
+  dpkg,
   rsync,
   rocmPackages,
 
   pname,
+  version,
 
   # List of string-typed dependencies.
   deps,
 
-  # List of components from the runfile.
+  # List of derivations that must be merged.
   components,
 }:
 
@@ -27,18 +30,14 @@ let
       "libdrm2-amdgpu"
     ]
   ) deps;
+  srcs = map (component: fetchurl { inherit (component) url sha256; }) components;
 in
 stdenv.mkDerivation rec {
-  inherit pname;
-  version = src.version;
-
-  src = callPackage ./runfile.nix { };
-
-  # Avoid expensive copy of the whole bundle on each build.
-  dontUnpack = true;
+  inherit pname version srcs;
 
   nativeBuildInputs = [
     autoPatchelfHook
+    dpkg
     rocmPackages.markForRocmRootHook
     rsync
   ];
@@ -48,12 +47,17 @@ stdenv.mkDerivation rec {
     stdenv.cc.cc.libgcc
   ] ++ (map (dep: rocmPackages.${dep}) filteredDeps);
 
+  # dpkg hook does not seem to work for multiple sources.
+  unpackPhase = ''
+    for src in $srcs; do
+      dpkg-deb -x "$src" .
+    done
+  '';
+
   installPhase = ''
     runHook preInstall
     mkdir $out
-    for bundleSrc in ${lib.concatStringsSep " " components}; do
-      rsync -a ${src}/component-rocm/$bundleSrc/content/opt/rocm-${version}/* $out/
-    done
+    cp -rT opt/rocm-* $out
     runHook postInstall
   '';
 

@@ -4,9 +4,12 @@
   newScope,
 }:
 
+{
+  packageMetadata,
+}:
+
 let
-  runfileMetadata = builtins.fromJSON (builtins.readFile ./runfile-metadata.json);
-  fixedPoint = final: { inherit callPackage lib runfileMetadata; };
+  fixedPoint = final: { inherit callPackage lib packageMetadata; };
   composed = lib.composeManyExtensions [
     # Hooks
     (import ./hooks.nix)

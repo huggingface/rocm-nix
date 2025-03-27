@@ -5,7 +5,7 @@ prev.lib.mapAttrs (
   pname: metadata:
   prev.callPackage ./generic.nix {
     inherit pname;
-    inherit (metadata) components deps;
+    inherit (metadata) components deps version;
     rocmPackages = final;
   }
-) prev.runfileMetadata
+) prev.packageMetadata

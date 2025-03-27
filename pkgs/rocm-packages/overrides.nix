@@ -5,18 +5,29 @@ let
 in
 applyOverrides {
   comgr =
-    { zlib, zstd }:
+    {
+      ncurses,
+      zlib,
+      zstd,
+    }:
     prevAttrs: {
       buildInputs = prevAttrs.buildInputs ++ [
+        ncurses
         zlib
         zstd
       ];
     };
 
   hipblas =
-    { hipblas-common-dev }:
+    {
+      lib,
+      hipblas-common-dev ? null,
+    }:
     prevAttrs: {
-      propagatedBuildInputs = prevAttrs.buildInputs ++ [ hipblas-common-dev ];
+      # Only available starting ROCm 6.3.
+      propagatedBuildInputs =
+        prevAttrs.buildInputs
+        ++ lib.optionals (hipblas-common-dev != null) [ hipblas-common-dev ];
     };
 
   hipblaslt =
@@ -26,9 +37,14 @@ applyOverrides {
     };
 
   hipify-clang =
-    { zlib, zstd }:
+    {
+      ncurses,
+      zlib,
+      zstd,
+    }:
     prevAttrs: {
       buildInputs = prevAttrs.buildInputs ++ [
+        ncurses
         zlib
         zstd
       ];
@@ -64,6 +80,14 @@ applyOverrides {
         '';
     };
 
+  hipsolver =
+    { suitesparse }:
+    prevAttrs: {
+      buildInputs = prevAttrs.buildInputs ++ [
+        suitesparse
+      ];
+    };
+
   hsa-rocr =
     {
       elfutils,
@@ -87,12 +111,14 @@ applyOverrides {
   rocm-llvm =
     {
       libxml2,
+      ncurses,
       zlib,
       zstd,
     }:
     prevAttrs: {
       buildInputs = prevAttrs.buildInputs ++ [
         libxml2
+        ncurses
         zlib
         zstd
       ];
@@ -119,8 +145,11 @@ applyOverrides {
     };
 
   roctracer =
-    { comgr }:
+    { comgr, hsa-rocr }:
     prevAttr: {
-      buildInputs = prevAttr.buildInputs ++ [ comgr ];
+      buildInputs = prevAttr.buildInputs ++ [
+        comgr
+        hsa-rocr
+      ];
     };
 }
